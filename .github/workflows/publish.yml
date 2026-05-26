@@ -1,0 +1,80 @@
+name: Publish model images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "manifests/**"
+      - "scripts/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/publish.yml"
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: "Manifest filename (without path or .txt) — empty = all"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  enumerate:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        run: |
+          filter="${{ github.event.inputs.manifest }}"
+          if [ -n "$filter" ]; then
+            files="manifests/${filter}.txt"
+            test -f "$files" || { echo "::error::no such manifest: $files"; exit 1; }
+          else
+            files=$(ls manifests/*.txt)
+          fi
+          matrix=$(printf '%s\n' $files | jq -R -s -c 'split("\n") | map(select(length>0))')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Matrix: $matrix"
+
+  build:
+    needs: enumerate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        manifest: ${{ fromJson(needs.enumerate.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        run: |
+          name=$(basename "${{ matrix.manifest }}" .txt)
+          echo "image_name=$name" >> "$GITHUB_OUTPUT"
+          echo "image_ref=ghcr.io/${{ github.repository }}/${name}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            MANIFEST=${{ matrix.manifest }}
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image_ref }}:latest
+            ${{ steps.meta.outputs.image_ref }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ steps.meta.outputs.image_name }}
+          cache-to: type=gha,scope=${{ steps.meta.outputs.image_name }},mode=max
+          secrets: |
+            ${{ secrets.HF_TOKEN != '' && format('hf_token={0}', secrets.HF_TOKEN) || '' }}

@@ -1,0 +1,7 @@
+# Models baked into ghcr.io/gurdeeps/model-images/sentiment
+# Consumed by the sentiment-classifier Lambda via COPY --from=
+# One HF repo ID per line. Blank lines and `#` comments are ignored.
+
+cardiffnlp/twitter-roberta-base-sentiment-latest
+sentence-transformers/all-MiniLM-L6-v2
+google/flan-t5-small
