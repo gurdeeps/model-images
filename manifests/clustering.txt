@@ -1,0 +1,7 @@
+# Models baked into ghcr.io/gurdeeps/model-images/clustering
+# Consumed by the topic-clusterer Lambda via COPY --from=
+# One HF repo ID per line. Blank lines and `#` comments are ignored.
+
+# Sentence-embedding model used by Chapter 5 of Hands-On LLMs for the
+# arXiv NLP clustering pipeline. 384-d, ~67MB, small enough for Lambda.
+thenlper/gte-small
