@@ -1,0 +1,11 @@
+# Models baked into ghcr.io/gurdeeps/model-images/prompt-engineering
+# Consumed by the prompt-engineer Lambda via COPY --from=
+# One HF repo ID per line. Blank lines and `#` comments are ignored.
+
+# Instruction-tuned chat model used by Chapter 6 of Hands-On LLMs. The
+# book uses Phi-3-mini-4k-instruct (~7.6 GB fp16) which doesn't fit
+# inside the 10 GB Lambda container-image ceiling once torch +
+# transformers are included; Qwen2.5-1.5B-Instruct (~3 GB) is a drop-in
+# chat-template-compatible substitute that exercises all the same
+# techniques (zero-shot, few-shot, CoT, structured output).
+Qwen/Qwen2.5-1.5B-Instruct
