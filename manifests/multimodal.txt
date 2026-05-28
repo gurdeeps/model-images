@@ -1,0 +1,8 @@
+# Models baked into ghcr.io/gurdeeps/model-images/multimodal
+# Consumed by the multimodal-clip Lambda via COPY --from=
+# One HF repo ID per line. Blank lines and `#` comments are ignored.
+
+# CLIP from Chapter 9 — joint text/image encoder used for zero-shot
+# text-to-image retrieval. ViT-Base/Patch-32 is the chapter's choice;
+# ~600MB on disk.
+openai/clip-vit-base-patch32

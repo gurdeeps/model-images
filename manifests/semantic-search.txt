@@ -1,0 +1,11 @@
+# Models baked into ghcr.io/gurdeeps/model-images/semantic-search
+# Consumed by the semantic-search Lambda via COPY --from=
+# One HF repo ID per line. Blank lines and `#` comments are ignored.
+
+# Bi-encoder used for dense retrieval — the embedding model the book uses
+# in Chapter 8's "Dense Retrieval Example". 384-d, ~80MB.
+sentence-transformers/all-MiniLM-L6-v2
+
+# Cross-encoder used to rerank candidates — same family as the book's
+# rerank example. ~80MB.
+cross-encoder/ms-marco-MiniLM-L-6-v2
